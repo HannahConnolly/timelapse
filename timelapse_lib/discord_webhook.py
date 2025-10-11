@@ -10,6 +10,8 @@ def send_discord_message(message, file_path=None):
         print("⚠️ No DISCORD_WEBHOOK_URL configured; skipping send. Message:", message)
         return
 
+    print("➡️ Sending to Discord:", message)
+
     data = {"content": message}
     files = None
 
