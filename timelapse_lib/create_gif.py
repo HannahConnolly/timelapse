@@ -39,13 +39,17 @@ def create_gif(gif_ms=150):
     filename = f"gif_{timestamp}.gif"
     output_path = os.path.join(GIFS_DIR, filename)
     
-    # Save the GIF
+    # Save the GIF with enhanced quality settings
     images[0].save(
         output_path,
         save_all=True,
         append_images=images[1:],
         duration=gif_ms,
-        loop=0
+        loop=0,
+        optimize=False,  # Disable optimization to preserve quality
+        quality=100,     # Use maximum quality
+        colors=256,      # Use maximum color palette
+        dither=Image.Dither.FLOYDSTEINBERG  # Use high quality dithering
     )
 
     full_path = os.path.join(GIFS_DIR, filename)
