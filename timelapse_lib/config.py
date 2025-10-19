@@ -3,6 +3,7 @@ import json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PHOTOS_DIR = os.path.join(BASE_DIR, "photos")
+GIFS_DIR = os.path.join(BASE_DIR, "gifs")
 
 
 def load_secrets():
