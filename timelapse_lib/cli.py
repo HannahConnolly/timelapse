@@ -1,7 +1,8 @@
 from .capture import capture_photo
 from .discord_webhook import send_discord_message
 from .disk_stats import get_free_space_gb_str
-from .create_gif import create_gif
+from .create_animation import create_gif
+from .create_animation import create_webm
 import datetime
 import traceback
 import argparse
@@ -12,6 +13,8 @@ def init_argparse():
     parser.add_argument('-d', '--discord', action='store_true', help='Send Discord notifications')
     parser.add_argument('-g', '--gif', action='store_true', help='Create animated GIF from captured photos')
     parser.add_argument('-m', '--gif-ms', type=int, default=150, metavar='MS', help='Frame duration in milliseconds for GIF (default: 100)')
+    parser.add_argument('-w', '--webm', action='store_true', help='Create animated WebM from captured photos')
+    parser.add_argument('-f', '--webm-fps', type=int, default=6, metavar='MS', help='FPS for webm (default: 6)')
     return parser
 
 
@@ -20,6 +23,8 @@ def main(argv):
     args = parser.parse_args(argv)
     if args.gif:
         call_create_gif(args)
+    elif args.webm:
+        call_create_webm(args)
     else:
         call_take_photo(args)
 
@@ -39,9 +44,21 @@ def call_take_photo(args):
             send_discord_message(error_msg)
         print(error_msg)
 
+def call_create_webm(args):
+    try:
+        output_webm = create_webm(args.webm_fps)
+        if args.discord:
+            send_discord_message("✅ Created timelapse webm", file_path=output_webm)
+    except Exception as e:
+        error_msg = f"❌ Error during capture:\n```\n{traceback.format_exc()}\n```"
+        if args.discord:
+            send_discord_message(error_msg)
+        print(error_msg)
+
 def call_create_gif(args):
     try:
-        output_gif = create_gif(gif_ms=args.gif_ms)
+        # output_gif = create_gif(gif_ms=args.gif_ms)
+        output_gif = create_webm()
         if args.discord:
             send_discord_message("✅ Created timelapse GIF", file_path=output_gif)
     except Exception as e:
