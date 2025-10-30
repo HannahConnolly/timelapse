@@ -3,6 +3,7 @@ from .discord_webhook import send_discord_message
 from .disk_stats import get_free_space_gb_str
 from .create_animation import create_gif
 from .create_animation import create_webm
+from .epd_display import show_message, show_error
 import datetime
 import traceback
 import argparse
@@ -36,9 +37,21 @@ def call_take_photo(args):
         disk_space = get_free_space_gb_str("/")
         if not args.gif:
             filename = capture_photo()
+            # show a brief success message on a connected Waveshare e-paper
+            try:
+                show_message("Photo captured", f"{datetime.datetime.now().strftime('%m/%d %H:%M')} - {disk_space}")
+            except Exception:
+                # ensure display failures don't affect capture
+                pass
             if args.discord:
                 send_discord_message(f"✅ Captured photo on {datetime.datetime.now().strftime('%m/%d')} - {disk_space}", file_path=filename)
     except Exception as e:
+        # try to show a compact error message on the e-paper display
+        try:
+            show_error(e)
+        except Exception:
+            pass
+
         error_msg = f"❌ Error during capture:\n```\n{traceback.format_exc()}\n```"
         if args.discord:
             send_discord_message(error_msg)
