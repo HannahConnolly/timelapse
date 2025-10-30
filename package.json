@@ -1,0 +1,13 @@
+{
+  "name": "timelapse",
+  "version": "1.0.0",
+  "description": "Timelapse capture utilities and helper scripts (Python project).",
+  "scripts": {
+    "start": "python3 timelapse.py",
+    "capture": "python3 timelapse_lib/cli.py",
+    "capture:discord": "python3 timelapse_lib/cli.py --discord",
+    "capture:gif": "python3 timelapse_lib/cli.py --gif",
+    "create:gif": "python3 -c \"from timelapse_lib.create_animation import create_gif; print(create_gif())\"",
+    "test": "pytest -q"
+  }
+}
