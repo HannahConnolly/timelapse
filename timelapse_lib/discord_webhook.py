@@ -23,7 +23,7 @@ def send_discord_message(message, file_path=None):
             files = None
 
     try:
-        response = requests.post(WEBHOOK_URL, data=data, files=files)
+        response = requests.post(WEBHOOK_URL, data=data, files=files, timeout=10)
         if response.ok:
             print("✅ Sent to Discord")
         else:
