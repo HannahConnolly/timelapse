@@ -41,8 +41,7 @@ latest_image = max(image_files, key=lambda p: p.stat().st_mtime)
 with latest_image.open("rb") as f:
     image_bytes = f.read()
 
-prompt_text = "Describe what's in this photo and give plant-care suggestions."
-
+prompt_text = "Respond in JSON with 'plant_score' and 'plant_care' fields. Plant score is out of 100 and give plant-care suggestions."
 # Build typed content objects expected by the SDK
 import mimetypes
 
@@ -56,6 +55,8 @@ content = types.Content(parts=[text_part, image_part])
 
 response = client.models.generate_content(
     model="gemini-2.5-flash",
+    # model="gemini-2.0-flash",
+    config={"response_mime_type": "application/json"},
     contents=[content],
 )
 
