@@ -15,9 +15,9 @@ def load_secrets():
     data = {}
 
     # Highest precedence: explicit environment variables
-    env_val = os.environ.get("DISCORD_WEBHOOK_URL")
+    env_val = os.environ.get("PHOTO_WEBHOOK_URL")
     if env_val:
-        data["DISCORD_WEBHOOK_URL"] = env_val
+        data["PHOTO_WEBHOOK_URL"] = env_val
 
     # Next: parse a .env file in the project root (simple KEY=VALUE parser)
     dotenv_path = os.path.join(BASE_DIR, ".env")
@@ -43,5 +43,8 @@ def load_secrets():
     return data
 
 
-def get_webhook_url():
-    return load_secrets().get("DISCORD_WEBHOOK_URL")
+def get_photo_webhook_url():
+    return load_secrets().get("PHOTO_WEBHOOK_URL")
+
+def get_ai_webhook_url():
+    return load_secrets().get("PHOTO_AI_URL")
