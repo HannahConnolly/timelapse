@@ -7,4 +7,4 @@ This package is intentionally small and dependency-light so tests and other
 tools can import `capture` without loading network code.
 """
 
-__all__ = ["config", "capture", "discord_webhook", "cli", "disk_stats", "create_gif"]
+__all__ = ["config", "capture", "discord_webhook", "cli", "disk_stats", "create_gif", "create_animation", "database", "gemini"]

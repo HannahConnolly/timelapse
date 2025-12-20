@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from timelapse_lib.cli import main
 import sys
 

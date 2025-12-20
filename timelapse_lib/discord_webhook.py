@@ -1,35 +1,40 @@
-import os
 import requests
-from timelapse_lib.config import get_webhook_url
+from timelapse_lib.config import get_photo_webhook_url, get_ai_webhook_url
+from .gemini import send_to_gemini
 
-
-def send_discord_message(message, file_path=None):
-    """Send a text message (and optional image) to Discord via webhook."""
-    WEBHOOK_URL = get_webhook_url()
-    if not WEBHOOK_URL:
-        print("⚠️ No DISCORD_WEBHOOK_URL configured; skipping send. Message:", message)
+def _execute_webhook(webhook_url, message, file_path=None):
+    """Internal helper to handle the actual network request."""
+    if not webhook_url:
+        print(f"⚠️ Webhook URL missing. Cannot send: {message[:30]}")
         return
-
-    print("➡️ Sending to Discord:", message)
 
     data = {"content": message}
     files = None
 
-    if file_path:
-        try:
-            files = {"file": open(file_path, "rb")}
-        except Exception as e:
-            print(f"⚠️ Could not open file for upload: {e}")
-            files = None
-
     try:
-        response = requests.post(WEBHOOK_URL, data=data, files=files)
+        if file_path:
+            files = {"file": open(file_path, "rb")}
+        
+        response = requests.post(webhook_url, data=data, files=files, timeout=10)
+        
         if response.ok:
-            print("✅ Sent to Discord")
+            print(f"✅ Successfully posted to Discord")
         else:
-            print(f"❌ Discord upload failed: {response.status_code} - {response.text}")
+            print(f"❌ Discord error: {response.status_code} - {response.text}")
+            
     except Exception as e:
-        print(f"⚠️ Error sending to Discord: {e}")
+        print(f"⚠️ Request error: {e}")
     finally:
-        if files and files.get("file"):
+        if files:
             files["file"].close()
+
+
+def send_discord_message_in_photo_channel(message, file_path=None):
+    url = get_photo_webhook_url()
+    _execute_webhook(url, message, file_path)
+
+def send_discord_message_in_ai_channel(message, file_path=None):
+    url = get_ai_webhook_url()
+    message = send_to_gemini()
+    message = f"🤖 AI Analysis:\n```json\n{message}\n```"
+    _execute_webhook(url, message, file_path)
