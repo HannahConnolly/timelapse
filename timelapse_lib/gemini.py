@@ -14,6 +14,12 @@ def send_to_gemini():
         photos_dir = Path(os.getenv("PHOTO_PATH") or "./photos").expanduser()
     else:
         photos_dir = default_photos_dir
+
+    # If the configured path is relative (e.g. "photos" or "./photos"),
+    # interpret it relative to the project root so cron (or other CWDs)
+    # still find the correct directory.
+    if not photos_dir.is_absolute():
+        photos_dir = (Path(__file__).parent.parent / photos_dir).resolve()
     allowed_ext = {".jpg", ".jpeg", ".png", ".heic", ".webp"}
     if not photos_dir.exists():
         raise SystemExit(f"photos directory not found: {photos_dir}")
