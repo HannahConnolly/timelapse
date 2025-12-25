@@ -4,6 +4,8 @@ import dotenv
 from pathlib import Path
 from google import genai
 from google.genai import types
+import json
+from .database import store_photo, store_analysis, extract_plant_score
 
 def send_to_gemini():
     dotenv.load_dotenv()
@@ -55,4 +57,39 @@ def send_to_gemini():
         contents=[content],
     )
 
-    return(response.text)
+    response_text = response.text
+
+    # Try to parse structured JSON response
+    plant_score = None
+    description = None
+    try:
+        parsed = json.loads(response_text)
+        plant_score = parsed.get("plant_score")
+        description = parsed.get("plant_care") or parsed.get("plant_care_suggestions") or parsed.get("description")
+    except Exception:
+        parsed = None
+
+    # Fallback: attempt to extract a numeric score from free-text
+    if plant_score is None:
+        try:
+            plant_score = extract_plant_score(response_text)
+        except Exception:
+            plant_score = None
+
+    # Fallback description
+    if not description:
+        description = response_text
+
+    # Ensure the photo is recorded in the DB and store the AI analysis
+    try:
+        photo_id = store_photo(latest_image)
+    except Exception:
+        photo_id = None
+
+    try:
+        if photo_id is not None:
+            store_analysis(photo_id, description, plant_score=plant_score)
+    except Exception:
+        pass
+
+    return response_text

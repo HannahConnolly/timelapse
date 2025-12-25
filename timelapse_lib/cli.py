@@ -3,6 +3,7 @@ from .discord_webhook import send_discord_message_in_photo_channel, send_discord
 from .disk_stats import get_free_space_gb_str
 from .create_animation import create_gif
 from .create_animation import create_webm
+from .database import store_photo
 import datetime
 import traceback
 import argparse
@@ -39,6 +40,11 @@ def call_take_photo(args):
         disk_space = get_free_space_gb_str("/")
         if not args.gif:
             filename = capture_photo()
+            # store captured photo in the database (id or None)
+            try:
+                photo_id = store_photo(filename)
+            except Exception:
+                photo_id = None
             if args.discord:
                 send_discord_message_in_photo_channel(f"✅ Captured photo on {datetime.datetime.now().strftime('%m/%d')} - {disk_space}", file_path=filename)
     except Exception as e:
